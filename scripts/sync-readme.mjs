@@ -8,6 +8,7 @@ const rootPath = fileURLToPath(root);
 const resourcesPath = new URL("resources/resources.json", root);
 const verificationsPath = new URL("reports/verifications.json", root);
 const availabilityPath = new URL("reports/availability.json", root);
+const sourcesPath = new URL("reports/sources.json", root);
 const readmePath = new URL("README.md", root);
 const startMarker = "<!-- featured-resources:start -->";
 const endMarker = "<!-- featured-resources:end -->";
@@ -94,6 +95,32 @@ function statusDisplay(status) {
     unreachable: "🔴&#8288;无法&#8288;访问",
     unknown: "⚪&#8288;未&#8288;检测"
   }[status] ?? "⚪&#8288;未&#8288;检测";
+}
+
+/**
+ * 「可用源」列的展示文案。与 `scripts/probe-sources.mjs` 里的同名函数保持一致：
+ * 那边负责每日回填，这里负责首次渲染（该列刚加入、或报告尚未生成时）。
+ */
+function playableDisplay(result) {
+  const status = result?.status ?? "unknown";
+  if (status === "usable" && result.passed > 0) {
+    return `🟢&#8288;${result.passed}&#8288;个`;
+  }
+  return {
+    dead: "🔴&#8288;全&#8288;不&#8288;可&#8288;用",
+    no_cms: "⚪&#8288;无&#8288;接&#8288;口",
+    unreadable: "🔴&#8288;读&#8288;不&#8288;到",
+    unknown: "⚪&#8288;未&#8288;检&#8288;测"
+  }[status] ?? "⚪&#8288;未&#8288;检&#8288;测";
+}
+
+/** 读取可选报告：文件缺失或内容异常时返回 null，不让 README 同步整体失败 */
+async function readOptionalJson(path) {
+  try {
+    return JSON.parse(await readFile(new URL(path, root), "utf8"));
+  } catch {
+    return null;
+  }
 }
 
 function dateInTimeZone(timestamp) {
@@ -280,6 +307,7 @@ function sortFeaturedResources(resources, categoryId) {
 function tableFor(resources, availabilityById, options = {}) {
   const summaryHeading = options.summaryHeading ?? "简介";
   const thirdHeading = options.thirdHeading ?? "推荐指数";
+  const playableById = options.playableById ?? null;
   const rows = resources
     .map((resource) => {
       const availability = availabilityById.get(resource.id);
@@ -301,13 +329,23 @@ function tableFor(resources, availabilityById, options = {}) {
         typeof options.thirdCell === "function"
           ? options.thirdCell(resource)
           : recommendationStars(resource);
+      const playableCell = playableById
+        ? ` <!-- playable:${resource.id} -->${playableDisplay(playableById.get(resource.id))}<!-- /playable:${resource.id} --> |`
+        : "";
 
-      return `| ${nameCell} | ${summaryCell} | ${markdownCell(thirdCell)} | <!-- availability:${resource.id} -->${status}<!-- /availability:${resource.id} --> | <!-- availability-date:${resource.id} -->${checkedAt}<!-- /availability-date:${resource.id} --> |`;
+      return `| ${nameCell} | ${summaryCell} | ${markdownCell(thirdCell)} | <!-- availability:${resource.id} -->${status}<!-- /availability:${resource.id} --> | <!-- availability-date:${resource.id} -->${checkedAt}<!-- /availability-date:${resource.id} --> |${playableCell}`;
     })
     .join("\n");
 
-  return `| 资源 | ${summaryHeading} | ${thirdHeading} | 状态 | 检测时间 |
-| --- | --- | :---: | :---: | :---: |
+  const heading = playableById
+    ? `| 资源 | ${summaryHeading} | ${thirdHeading} | 状态 | 检测时间 | 可用源 |`
+    : `| 资源 | ${summaryHeading} | ${thirdHeading} | 状态 | 检测时间 |`;
+  const separator = playableById
+    ? "| --- | --- | :---: | :---: | :---: | :---: |"
+    : "| --- | --- | :---: | :---: | :---: |";
+
+  return `${heading}
+${separator}
 ${rows}`;
 }
 
@@ -366,7 +404,7 @@ function categoryIntro(categoryId) {
   return "";
 }
 
-function categorySection(category, resources, availabilityById) {
+function categorySection(category, resources, availabilityById, sourcesById) {
   const categoryResources = sortFeaturedResources(
     resources.filter((resource) => resource.category === category.id),
     category.id
@@ -387,7 +425,9 @@ function categorySection(category, resources, availabilityById) {
             plainName: (resource) =>
               category.id === "tvbox_config" && !resource.link_url,
             showUrlInSummary: (resource) =>
-              category.id === "tvbox_config" && resource.summary_short === "影视仓配置地址"
+              category.id === "tvbox_config" && resource.summary_short === "影视仓配置地址",
+            // 「可用源」列只对 TVBox 配置有意义：其他分类没有「配置里的采集接口」这个概念
+            playableById: category.id === "tvbox_config" ? sourcesById : null
           });
   } else {
     content =
@@ -506,9 +546,13 @@ if (updatedVerificationsText !== verificationsText) {
 
 const resourcesData = JSON.parse(resourcesText);
 const availabilityData = JSON.parse(await readFile(availabilityPath, "utf8"));
+const sourcesData = await readOptionalJson("reports/sources.json");
 const featuredResources = resourcesData.resources.filter((resource) => resource.featured);
 const availabilityById = new Map(
   availabilityData.results.map((result) => [result.resource_id, result])
+);
+const sourcesById = new Map(
+  (sourcesData?.results ?? []).map((result) => [result.resource_id, result])
 );
 
 const badges = categories
@@ -530,12 +574,14 @@ ${badges}
 
 状态只判断主页是否响应，不替代完整体验评价。完整检测结果见 [\`reports/availability.json\`](reports/availability.json)。
 
+\`可用源\` 列只对 TVBox/影视仓配置地址生效，表示该配置里抽出并探活通过的采集接口数量：\`🟢 N 个\` 表示有 N 个接口能取到内容，\`🔴 全不可用\` 表示配置里的接口本次全部失败，\`⚪ 无接口\` 表示配置里没有可直连的采集接口（例如全是需要 TVBox 引擎的条目），\`🔴 读不到\` 表示配置取不到或不是 TVBox 配置。完整结果见 [\`reports/sources.json\`](reports/sources.json)。
+
 检测任务每天北京时间 09:00 左右运行；新增或修改资源后也会自动运行。你也可以在 [Check availability](https://github.com/laoma528/awesome-zhuiju-free/actions/workflows/check-availability.yml) 页面手动触发。
 
 </details>
 
 ${categories
-  .map((category) => categorySection(category, featuredResources, availabilityById))
+  .map((category) => categorySection(category, featuredResources, availabilityById, sourcesById))
   .join("\n\n")}
 ${endMarker}`;
 
