@@ -25,6 +25,7 @@ const statuses = new Set([
 const risks = new Set(["low", "medium", "high", "unknown"]);
 const methods = new Set(["manual", "automated", "mixed"]);
 const availabilityStatuses = new Set(["reachable", "restricted", "unreachable", "unknown"]);
+const playableStatuses = new Set(["usable", "dead", "no_cms", "unreadable", "unknown"]);
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const errors = [];
@@ -58,6 +59,7 @@ function checkScore(value, path) {
 const resourcesData = await readJson("resources/resources.json");
 const verificationsData = await readJson("reports/verifications.json");
 const availabilityData = await readJson("reports/availability.json");
+const sourcesData = await readJson("reports/sources.json");
 await readJson("reports/notices.json");
 
 if (resourcesData) {
@@ -184,6 +186,48 @@ if (availabilityData?.generated_at !== null) {
   }
 }
 
+if (sourcesData) {
+  check(
+    sourcesData.generated_at === null ||
+      (typeof sourcesData.generated_at === "string" &&
+        !Number.isNaN(Date.parse(sourcesData.generated_at))),
+    "sources.generated_at: expected ISO timestamp or null"
+  );
+  check(Array.isArray(sourcesData.results), "sources.results: expected an array");
+}
+
+const sourcesResourceIds = new Set();
+for (const [index, result] of (sourcesData?.results ?? []).entries()) {
+  const path = `sources.results[${index}]`;
+  check(resourceIds.has(result.resource_id), `${path}.resource_id: unknown resource "${result.resource_id}"`);
+  check(
+    !sourcesResourceIds.has(result.resource_id),
+    `${path}.resource_id: duplicate resource "${result.resource_id}"`
+  );
+  sourcesResourceIds.add(result.resource_id);
+  check(playableStatuses.has(result.status), `${path}.status: unknown playable status`);
+  check(
+    typeof result.checked_at === "string" && !Number.isNaN(Date.parse(result.checked_at)),
+    `${path}.checked_at: expected ISO timestamp`
+  );
+  for (const counter of ["cms_total", "cms_unique", "passed"]) {
+    check(
+      Number.isInteger(result[counter]) && result[counter] >= 0,
+      `${path}.${counter}: expected a non-negative integer`
+    );
+  }
+  check(
+    !Array.isArray(result.failed_samples) ||
+      result.failed_samples.every((sample) => typeof sample?.url === "string"),
+    `${path}.failed_samples: expected objects with a url`
+  );
+}
+
+// 这里刻意**不**要求每条 featured 的 tvbox_config 都出现在 sources.json 里。
+// availability.json 由每日任务整体覆盖，所以可以要求完整；而新增一条 TVBox 配置的
+// 人工 PR 不该因为「还没跑过探测脚本」而被卡住——那属于流程问题，不该由校验拦。
+// 因此只做自洽性检查：引用的资源存在、状态合法、时间戳合法、不重复。
+
 if (errors.length > 0) {
   console.error(`Data validation failed with ${errors.length} error(s):`);
   for (const error of errors) {
@@ -192,6 +236,6 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Data validation passed: ${resourceIds.size} resources, ${verificationIds.size} verification records, ${availabilityResourceIds.size} availability results.`
+    `Data validation passed: ${resourceIds.size} resources, ${verificationIds.size} verification records, ${availabilityResourceIds.size} availability results, ${sourcesResourceIds.size} playable-source results.`
   );
 }

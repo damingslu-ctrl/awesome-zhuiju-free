@@ -11,6 +11,7 @@ on:
       - "resources/resources.json"
       - "scripts/sync-readme.mjs"
       - "scripts/check-availability.mjs"
+      - "scripts/probe-sources.mjs"
       - ".github/workflows/check-availability.yml"
 
 permissions:
@@ -34,13 +35,15 @@ jobs:
         run: node scripts/sync-readme.mjs
       - name: Check featured resources
         run: node scripts/check-availability.mjs
+      - name: Probe playable sources in TVBox configs
+        run: node scripts/probe-sources.mjs
       - name: Validate data
         run: node scripts/validate-data.mjs
       - name: Commit availability results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md reports/availability.json
+          git add README.md reports/availability.json reports/sources.json
           git diff --cached --quiet && exit 0
           git commit -m "chore: update daily availability"
           git push

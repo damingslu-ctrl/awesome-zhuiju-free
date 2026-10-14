@@ -1,0 +1,258 @@
+{
+  "version": 1,
+  "generated_at": "2026-10-14T16:18:38.942Z",
+  "prober": {
+    "environment": "local",
+    "config_timeout_ms": 10000,
+    "source_timeout_ms": 8000,
+    "config_concurrency": 4,
+    "source_concurrency": 8,
+    "max_attempts": 2,
+    "multi_repo_children": 8,
+    "time_zone": "Asia/Shanghai"
+  },
+  "results": [
+    {
+      "resource_id": "fan-tai-ying",
+      "url": "http://www.饭太硬.net/tv",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 904,
+      "checked_at": "2026-10-14T16:18:38.945Z",
+      "error": "返回图片（image/x-ms-bmp）",
+      "failed_samples": []
+    },
+    {
+      "resource_id": "fei-mao",
+      "url": "http://肥猫.net/",
+      "status": "no_cms",
+      "config_format": "tvbox",
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 1337,
+      "checked_at": "2026-10-14T16:18:39.014Z",
+      "error": null,
+      "failed_samples": []
+    },
+    {
+      "resource_id": "lao-liu-bei",
+      "url": "https://raw.liucn.cc/box/m.json",
+      "status": "usable",
+      "config_format": "tvbox",
+      "cms_total": 12,
+      "cms_unique": 12,
+      "passed": 5,
+      "response_ms": 16976,
+      "checked_at": "2026-10-14T16:18:39.015Z",
+      "error": null,
+      "failed_samples": [
+        {
+          "name": "👒┃小胡┃资源┃",
+          "url": "http://c.xn--yetu07f.icu/api.php/provide/vod",
+          "reason": "连接失败"
+        },
+        {
+          "name": "🥗┃非凡┃资源",
+          "url": "http://ffzy1.tv/api.php/provide/vod",
+          "reason": "超时"
+        },
+        {
+          "name": "🦁┃四九┃资源",
+          "url": "https://49zy1.com/api.php/provide/vod",
+          "reason": "连接失败"
+        },
+        {
+          "name": "🛰️飞速┃采集",
+          "url": "https://www.feisuzyapi.com/api.php/provide/vod",
+          "reason": "返回内容不是 JSON"
+        },
+        {
+          "name": "🐯┃奇虎┃采集",
+          "url": "https://caiji.qhzyapi.com/api.php/provide/vod",
+          "reason": "连接失败"
+        }
+      ]
+    },
+    {
+      "resource_id": "xiao-ma",
+      "url": "https://szyyds.cn/tv/x.json",
+      "status": "usable",
+      "config_format": "tvbox",
+      "cms_total": 15,
+      "cms_unique": 13,
+      "passed": 13,
+      "response_ms": 4926,
+      "checked_at": "2026-10-14T16:18:39.019Z",
+      "error": null,
+      "failed_samples": []
+    },
+    {
+      "resource_id": "mo-yu-er",
+      "url": "http://摸鱼儿.cc",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 115,
+      "checked_at": "2026-10-14T16:18:39.849Z",
+      "error": "连接失败",
+      "failed_samples": []
+    },
+    {
+      "resource_id": "wang-er-xiao",
+      "url": "http://new.王二小放牛娃.top",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 2490,
+      "checked_at": "2026-10-14T16:18:39.964Z",
+      "error": "不是合法的 JSON",
+      "failed_samples": []
+    },
+    {
+      "resource_id": "xiao-he-zi-4k",
+      "url": "http://xhztv.top/4k.json",
+      "status": "usable",
+      "config_format": "tvbox",
+      "cms_total": 9,
+      "cms_unique": 9,
+      "passed": 5,
+      "response_ms": 4871,
+      "checked_at": "2026-10-14T16:18:40.351Z",
+      "error": null,
+      "failed_samples": [
+        {
+          "name": "🔥┃小胡┃4K",
+          "url": "http://xh1.xn--yetu07f.icu/api.php/provide/vod",
+          "reason": "连接失败"
+        },
+        {
+          "name": "🧡┃初恋┃官源",
+          "url": "https://video.adminqt.cn/api.php/provide/vod",
+          "reason": "HTTP 429"
+        },
+        {
+          "name": "🐻┃熊掌┃高清",
+          "url": "https://xzcjz.com/api.php/provide/vod",
+          "reason": "连接失败"
+        },
+        {
+          "name": "🐓┃爱坤┃资源",
+          "url": "https://ikunzyapi.com/api.php/provide/vod",
+          "reason": "连接失败"
+        }
+      ]
+    },
+    {
+      "resource_id": "xiao-he-zi-single",
+      "url": "http://xhztv.top/xhz",
+      "status": "no_cms",
+      "config_format": "tvbox",
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 1714,
+      "checked_at": "2026-10-14T16:18:42.454Z",
+      "error": null,
+      "failed_samples": []
+    },
+    {
+      "resource_id": "vox",
+      "url": "http://rihou.cc:88/demo.php",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 7776,
+      "checked_at": "2026-10-14T16:18:43.945Z",
+      "error": "连接失败",
+      "failed_samples": []
+    },
+    {
+      "resource_id": "ao-wu",
+      "url": "http://itv666.cc/aowu/config.webp",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 2355,
+      "checked_at": "2026-10-14T16:18:44.168Z",
+      "error": "不是合法的 JSON",
+      "failed_samples": []
+    },
+    {
+      "resource_id": "wu-ming",
+      "url": "https://6800.kstore.vip/fish.json",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 120,
+      "checked_at": "2026-10-14T16:18:45.222Z",
+      "error": "HTTP 401",
+      "failed_samples": []
+    },
+    {
+      "resource_id": "xiao-he-zi-multi",
+      "url": "http://xhztv.top/dc",
+      "status": "no_cms",
+      "config_format": "multi_repo",
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 21706,
+      "checked_at": "2026-10-14T16:18:45.342Z",
+      "error": null,
+      "failed_samples": []
+    },
+    {
+      "resource_id": "shi-guang-multi",
+      "url": "http://xmbjm.fh4u.org/dc.txt",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 1586,
+      "checked_at": "2026-10-14T16:18:46.523Z",
+      "error": "不是合法的 JSON",
+      "failed_samples": []
+    },
+    {
+      "resource_id": "ting-hao-share-multi",
+      "url": "http://ztha.top/TVBox/GYCK.json",
+      "status": "no_cms",
+      "config_format": "multi_repo",
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 20696,
+      "checked_at": "2026-10-14T16:18:48.109Z",
+      "error": null,
+      "failed_samples": []
+    },
+    {
+      "resource_id": "xiao-he-zi",
+      "url": "https://www.xhztv.pro/",
+      "status": "unreadable",
+      "config_format": null,
+      "cms_total": 0,
+      "cms_unique": 0,
+      "passed": 0,
+      "response_ms": 2083,
+      "checked_at": "2026-10-14T16:18:51.721Z",
+      "error": "不是合法的 JSON",
+      "failed_samples": []
+    }
+  ]
+}
